@@ -7,6 +7,20 @@
 
 ---
 
+## 文档索引
+
+| 文档 | 内容 |
+| --- | --- |
+| [docs/nvidia-dgpu-guide.md](docs/nvidia-dgpu-guide.md) | **RTX 3060 独显直连操作手册**：OpenCore 配置、U 盘 EFI、MUX 切换、驱动安装、故障对照、回滚 |
+| [docs/nvidia-dgpu-evaluation.md](docs/nvidia-dgpu-evaluation.md) | NullMoth 2.5.3 实测数据：连接器枚举、刷新率、硬解、性能对比 |
+| [docs/tuning.md](docs/tuning.md) | 调优记录：显示模式与 HiDPI、刷新验证、合成开销、电源、kext 顺序、boot-args 取舍 |
+| [docs/brightness-fix.md](docs/brightness-fix.md) | 背光控制链路、UI↔linear 曲线、驱动补丁、构建与部署 |
+| [docs/hybrid-mode-tuning.md](docs/hybrid-mode-tuning.md) | 混合模式基线：boot-args、硬性要求、切换步骤 |
+| [docs/HANDOFF.md](docs/HANDOFF.md) | 技术档案：硬件、配置、变更记录、已知问题、命令 |
+| [docs/status-report.md](docs/status-report.md) | 系统状态报告：kext 清单、崩溃记录、遗留问题 |
+
+---
+
 ## 0. 结论摘要
 
 | 项目 | 结果 |
@@ -440,6 +454,78 @@ powershell -ExecutionPolicy Bypass -File "写EFI到内置ESP.ps1" -Source STABLE
 ### 12.5 版本管理
 
 同一个 kext 名字、同一个版本号，可能是不同系统分支的构建（Sequoia vs Tahoe）。**必须比对可执行文件哈希**，并用 `MinKernel` / `MaxKernel` 加约束。
+
+---
+
+## 13. 独显直连（RTX 3060）
+
+### 13.1 驱动组成
+
+| 组件 | 位置 | 作用 |
+| --- | --- | --- |
+| `NVRM.kext` | `/Library/Extensions` | RM + NVKMS，加载 GSP 固件 |
+| `NVRMFB.kext` | 同上 | IOFramebuffer，head / mode / vblank |
+| `NVAccel.kext` | 同上 | IOAccelerator，合成表面 |
+| `NVRMAGDC.kext` | 同上 | AppleGraphicsDeviceControl 策略 |
+| `NVMTLDriver.bundle` | `/Library/GPUBundles` | Metal 驱动插件 |
+| GSP 固件 | `/Library/NullMoth/nvfw/nvidia/615.78.08` | |
+
+版本：NullMoth 2.5.3；GPU `10de:2520`（RTX 3060 Laptop）。
+
+### 13.2 OpenCore 配置
+
+| 键 | 值 | 说明 |
+| --- | --- | --- |
+| `SystemProductName` | `iMacPro1,1` | 无核显机型 |
+| `UEFI/Quirks/ResizeGpuBars` | `13` | BAR1 扩到 8 GB，NVRM 才能把 BAR1 移出控制台帧缓冲 |
+| `Booter/Quirks/ResizeAppleGpuBars` | `-1` | |
+| `Kernel/Block` | `com.apple.iokit.IONDRVSupport`（Exclude） | 让 NVRMFB 独占 display index 0 |
+| NootedRed | 关闭 | |
+| `SSDT-AMD-PGPU-DISABLE` | 关闭 | 否则 dGPU 在 PCI 上不可见 |
+
+boot-args：
+
+```
+nvfb=1 nvaccel=1 nvfbheads=4 -nvkmsnosmooth -nvrmnobootscreen
+nvrmsettle=10000 amfi_get_out_of_my_way=0x1 amfi=0x80
+```
+
+### 13.3 实测结果
+
+| 项 | 配置不全 | 配置完整 |
+| --- | --- | --- |
+| 连接器 | `ENUMERATED: 0 connected display(s)`，4 个 connector 全 `0x0` | 正常发布 1 个 head |
+| 帧缓冲 | 仅固件控制台缓冲 | NVRMFB 接管 |
+| 刷新率 | 系统报 `0.0 Hz`，实测 30 Hz | **239.9–240.0 Hz** |
+| 内屏分辨率 | 2560×1440（无模式控制） | 2560×1440，94 个模式含 32 HiDPI |
+| 启动等待 | 受限 | head 发布约 16 s |
+
+### 13.4 代价与限制
+
+| 项 | 数值 / 说明 |
+| --- | --- |
+| WindowServer CPU | 84–129 %（混合模式 33–42 %）；60 Hz 下仍 86 % |
+| 开机 | 比混合模式多约 16 s |
+| H.264 硬解 | 不可用：`libnvdec_h264.dylib` adhoc 签名被 AMFI 拒绝，`VTIsHardwareDecodeSupported(avc1)=False` |
+| HEVC | `VTIsHardwareDecodeSupported(hvc1)=True` |
+| HiDPI | 仅 1280×720（2×）；驱动不提供大于面板原生的背板，无法做 135 %–150 % HiDPI |
+| 功耗 | dGPU 常开，待机 52 °C |
+
+### 13.5 切换步骤
+
+1. Windows → NVIDIA 控制面板 → 管理显示模式 → 仅 NVIDIA
+2. 关机 → 开机按 F7 → U 盘 → OpenCore → macOS
+3. 安装驱动：`tar xzf` 后 `sudo ./install.sh`（需 PCI 上能见到 `10de`）
+4. 回滚：Windows 切回自动/混合 → 用内置硬盘启动
+
+### 13.6 与混合模式的选择
+
+| 场景 | 选择 |
+| --- | --- |
+| 日常办公 / 视频 / 续航 | 混合模式（iGPU 点屏 + NootedRed） |
+| 需要 dGPU 直接出画面（渲染 / 外接屏） | 独显直连（U 盘 EFI） |
+
+完整命令、故障对照、验证方法见 [docs/nvidia-dgpu-guide.md](docs/nvidia-dgpu-guide.md)。
 
 ---
 
