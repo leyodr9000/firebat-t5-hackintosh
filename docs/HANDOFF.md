@@ -1,6 +1,6 @@
-# Firebat T5 黑苹果 — 技术档案
+# Firebat T5A 黑苹果 — 技术档案
 
-机器：Firebat T5 / 同方 GM5ZG0O-F · R5-5600H（Cezanne）· macOS 15.8.1 (24H32) · OpenCore 1.0.8
+机器：Firebat T5A / 主板 GM5ZG0O-F · R5-5600H（Cezanne）· macOS 15.8.1 (24H32) · OpenCore 1.0.8
 
 ---
 
