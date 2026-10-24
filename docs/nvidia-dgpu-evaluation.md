@@ -1,6 +1,6 @@
 # NullMoth NVIDIA 驱动（2.5.3）实测记录
 
-对象：Firebat T5 · R5-5600H + RTX 3060 Laptop `10de:2520` · macOS 15.8.1
+对象：Firebat T5A · R5-5600H + RTX 3060 Laptop `10de:2520` · macOS 15.8.1
 
 ---
 
