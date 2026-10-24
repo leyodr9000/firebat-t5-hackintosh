@@ -5,6 +5,8 @@
 | `HANDOFF.md` | 硬件/系统/卷/生效配置/变更记录/已知问题/命令/测量数据 |
 | `hackintosh-status-2026-10-24.md` | 系统状态报告：平台、引导、kext、图形、崩溃、关机卡死 |
 | `nvidia-dgpu-efi-evaluation.md` | NullMoth 2.5.3 实测：配置要求、混合/直连数据、硬解、性能对比 |
+| `nvidia-dgpu-guide.md` | 独显直连操作手册：OpenCore 配置、U 盘 EFI、MUX 切换、驱动安装、故障对照、回滚 |
+| `tuning.md` | 调优记录：显示模式/HiDPI、刷新验证、合成开销、电源、kext 顺序、boot-args 取舍 |
 | `hybrid-mode-tuning.md` | NootedRed 混合模式基线：boot-args、硬性要求、可选项、切换步骤 |
 | `brightness-fix-tech-doc.md` | 背光控制链路、UI↔linear 实测曲线、驱动补丁、构建与部署 |
 | `display-bench.py` | 显示模式负载基准：`--list` / 默认 / `--sweep` |
