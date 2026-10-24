@@ -1,6 +1,6 @@
-# Firebat T5 黑苹果 EFI（OpenCore 1.0.8）
+# Firebat T5A 黑苹果 EFI（OpenCore 1.0.8）
 
-**适用**：Firebat T5 / 同方 GM5ZG0O-F、AMD Ryzen 5 5600H（Cezanne）、BoE NE156QHM-NZ2 2560×1440 240Hz eDP、Intel AX200。
+**适用**：Firebat T5A / 同方 GM5ZG0O-F、AMD Ryzen 5 5600H（Cezanne）、BoE NE156QHM-NZ2 2560×1440 240Hz eDP、Intel AX200。
 **系统**：macOS 15.8.1 (24H32)
 
 ## ⚠️ 使用前必读
