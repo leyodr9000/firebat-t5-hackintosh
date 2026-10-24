@@ -1,7 +1,7 @@
-# Firebat T5（R5-5600H）黑苹果 macOS 15 实操报告
+# Firebat T5A（R5-5600H）黑苹果 macOS 15 实操报告
 
 **日期**：2026-10-22 ～ 2026-10-24
-**机器**：Firebat T5 / 同方 GM5ZG0O-F
+**机器**：Firebat T5A / 同方 GM5ZG0O-F
 **结果**：macOS 15.8.1（24H32）可用，核显加速正常，Wi-Fi 正常，连续稳定运行 1 小时以上
 **崩溃根因**：NootedRed fork 1.0.0 的 user-space Metal SubmitGuard 补丁
 
@@ -27,7 +27,7 @@
 
 | 部件 | 型号 / 参数 |
 |---|---|
-| 机身 | Firebat T5，主板同方 GM5ZG0O-F |
+| 机身 | Firebat T5A，主板同方 GM5ZG0O-F |
 | CPU | AMD Ryzen 5 5600H（Cezanne，6 核 12 线程） |
 | 核显 | AMD Radeon Vega 7，`1002:1638`，ACPI 路径 `\_SB.PCI0.GP17.IGPU`（00:08.1） |
 | 独显 | NVIDIA RTX 3060 Mobile，`10DE:2520`（00:01.0），**ACPI 层禁用** |
