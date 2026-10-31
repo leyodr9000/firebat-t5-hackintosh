@@ -254,8 +254,8 @@ EFI-OTA-NONR  →  NootedRed 关闭，其余保持
 |---|---|---|---|
 | laobamac 官方 Sequoia | 15,918,064 | `ec4c1fc8…` | **15 用** |
 | laobamac 官方 Tahoe | 15,921,120 | `259bac94…` | 26 用 |
-| 群友 EFI 内 | 15,921,120 | `259bac94…` | ❌ 是 Tahoe |
-| 本地备份 | 15,918,064 | `ec4c1fc8…` | ✅ 是 Sequoia |
+| 群友 EFI 内 | 15,921,120 | `259bac94…` | 不符（实为 Tahoe） |
+| 本地备份 | 15,918,064 | `ec4c1fc8…` | 符合（实为 Sequoia） |
 
 处理：换回 Sequoia 构建，并加内核范围约束，防止误加载。
 
@@ -432,7 +432,7 @@ powershell -ExecutionPolicy Bypass -File "写EFI到内置ESP.ps1" -Source STABLE
 3. **每次改完必须跑 ocvalidate**，目标是 `No issues found`。
 4. **OC ≥ 0.6.6 自带 APFS**，不要再放 `ApfsDriverLoader.efi`。
 
-### 12.2 ESP 空间管理（踩过大坑）
+### 12.2 ESP 空间管理（历史事故）
 
 - 1 GB 的 ESP 放 55 MB 的 EFI，**备份会迅速吃满**。曾出现剩余 5.5 MB、只拷进 67/186 个文件、导致完全无法引导的情况。
 - 现在写入脚本会：只保留最新 2 份备份、拷贝前预检"EFI 大小 + 40 MB"的空间。
@@ -572,3 +572,9 @@ grep -o 'Boot args:.*' /path/to/kernel.log | sort -u
 | SubmitGuard | NootedRed 中给 Metal 命令缓冲尾部填空白的内核补丁 |
 | panic | 内核崩溃，会生成 `.panic` 报告 |
 | 野写 | 驱动向自己缓冲区之外写数据，破坏其他内核内存 |
+
+---
+
+## 免责声明
+
+本文记录的是单一机型（Firebat T5A / R5-5600H）在特定 BIOS 版本与 macOS 版本下的实测结果。黑苹果属于非官方支持范围，OpenCore 配置、kext 版本与固件版本相互耦合，直接套用到其它硬件可能无法启动或丢失数据。操作前请备份 ESP 与数据，自行承担风险。
